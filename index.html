@@ -217,8 +217,9 @@ const firebaseConfig = {
         // 2. Logic to find the product
         const productBox = link.closest('.box');
         const productName = productBox.querySelector('.content h3').innerText;
+        const productDesc = productBox.querySelector('.content p')?.innerText || "";
 
-        cart.push(productName);
+        cart.push(`${productName} (${productDesc})`);
         
         // 3. Update the hidden form with the number + items
         cartInput.value = `Customer: ${phoneNumber} | Order: ` + cart.join(', ');
