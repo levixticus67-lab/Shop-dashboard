@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOJO | Admin Glass</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+    <style>
+        :root {
+            --pink: #e84393;
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            /* Animated Mesh Gradient Background */
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #581c87 100%);
+            overflow: hidden;
+        }
+
+        /* Floating background shapes for extra glass effect depth */
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            border-radius: 50%;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--pink); top: -50px; right: -50px; opacity: 0.4; }
+        .shape-2 { width: 400px; height: 400px; background: #4a90d9; bottom: -100px; left: -100px; opacity: 0.3; }
+
+        .admin-card {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #fff;
+        }
+
+        .admin-card h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .admin-card p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--pink);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        select option { background: #1e1b4b; }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--pink);
+            box-shadow: 0 0 15px rgba(232, 67, 147, 0.3);
+        }
+
+        .btn-update {
+            width: 100%;
+            padding: 16px;
+            background: var(--pink);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(232, 67, 147, 0.3);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(232, 67, 147, 0.5);
+            filter: brightness(1.1);
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            height: 20px;
+        }
+        .back-btn {
+            position: fixed; /* Keep it fixed so it stays in the corner */
+            top: 25px;
+            left: 25px;
+            z-index: 10000; /* Higher than the login overlay */
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Make it look good on your phone */
+        @media (max-width: 480px) {
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>Back to Shop
+    </a>
+    <div id="login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div class="glass-card" style="padding: 40px; text-align: center; border-radius: 20px; background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); color: white;">
+            <h2>Staff Access Only</h2>
+            <input type="password" id="adminPass" placeholder="Enter Password" style="padding: 15px; border-radius: 10px; border: none; outline: none; width: 250px; margin-top: 10px;">
+            <button onclick="checkPass()" style="margin-top: 20px; padding: 12px 30px; background: #e84393; color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold;">Login</button>
+            <p id="fail-msg" style="color: #ff7675; margin-top: 15px; font-size: 0.9rem;"></p>
+        </div>
+    </div>
+
+    <div id="admin-content" style="display: none;">
+        </div>
+
+<div class="shape shape-1"></div>
+<div class="shape shape-2"></div>
+
+<div class="admin-card">
+    <h1>JOJO</h1>
+    <p>PRODUCT MANAGEMENT</p>
+
+    <div class="input-group">
+        <i class="fas fa-search"></i>
+        <select id="prodID" onchange="toggleNewProductFields()">
+            <option value="">-- Select Product --</option>
+            <option value="NEW">+ Add New Product</option>
+            <option value="mouth-spray">Mouth Spray</option>
+            <option value="humidifier">Humidifier</option>
+            <option value="shower-gel">Shower Gel</option>
+            <option value="body-splash">Body Splash</option>
+            <option value="perfumes">Perfumes</option>
+        </select>
+    </div>
+
+    <div class="input-group" id="newNameGroup" style="display:none;">
+        <i class="fas fa-pen-nib"></i>
+        <input type="text" id="newProdName" placeholder="Product Name (e.g. Misty Rose)">
+    </div>
+
+    <div class="input-group">
+        <i class="fas fa-coins"></i>
+        <input type="number" id="curPrice" placeholder="Selling Price (Ugx)">
+    </div>
+
+    <div class="input-group">
+        <i class="fas fa-history"></i>
+        <input type="number" id="oldPrice" placeholder="Original Price (Ugx)">
+    </div>
+
+    <div class="input-group">
+        <i class="fas fa-image"></i>
+        <input type="text" id="imgURL" placeholder="Image URL (e.g. many.jpg)">
+    </div>
+
+    <div class="input-group">
+        <i class="fas fa-align-left"></i>
+        <textarea id="prodDesc" placeholder="Product Description..." style="width: 90%; padding: 15px 15px 15px 45px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 15px; color: white; font-family: inherit; resize: none;"></textarea>
+    </div>
+
+    <button class="btn-update" onclick="savePrice()">
+        <i class="fas fa-cloud-upload-alt"></i> Upload to Shop
+    </button>
+
+    <div id="status"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+    function checkPass() {
+    const pass = document.getElementById('adminPass').value;
+    const overlay = document.getElementById('login-overlay');
+    const content = document.getElementById('admin-content');
+    const fail = document.getElementById('fail-msg');
+
+    // Change 'Jojo2026' to whatever password you want!
+    if (pass === 'Jojo2026') {
+        overlay.style.display = 'none';
+        content.style.display = 'block';
+        // Optional: Save to session so you don't have to re-type on refresh
+        sessionStorage.setItem('isAdmin', 'true');
+    } else {
+        fail.innerText = "❌ Incorrect Password";
+    }
+}
+
+// Check if already logged in for this session
+window.onload = () => {
+    if (sessionStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+    }
+};
+    // PASTE YOUR CONFIG FROM INDEX.HTML HERE
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA9ER2RfVM4Iw7Ka6eQ100KDnbuFI31_pg",
+  authDomain: "jojo-collection.firebaseapp.com",
+  projectId: "jojo-collection",
+  storageBucket: "jojo-collection.firebasestorage.app",
+  messagingSenderId: "469101720449",
+  appId: "1:469101720449:web:c668b39259ea141f69ee80",
+  measurementId: "G-J9B2NQ19P5"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function savePrice() {
+        const id = document.getElementById('prodID').value;
+        const cur = parseInt(document.getElementById('curPrice').value);
+        const old = parseInt(document.getElementById('oldPrice').value);
+        const status = document.getElementById('status');
+
+        if(!cur || !old) {
+            status.innerHTML = '<span style="color: #ff7675;">❌ Enter all prices</span>';
+            return;
+        }
+
+        status.innerHTML = "⏳ Sending to Cloud...";
+
+        db.collection('products').doc(id).set({
+            currentPrice: cur,
+            oldPrice: old,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true })
+        .then(() => {
+            status.innerHTML = '<span style="color: #55efc4;">✅ Shop Updated Successfully!</span>';
+            setTimeout(() => { status.innerHTML = ''; }, 3000);
+        })
+        .catch(err => {
+            status.innerHTML = '❌ Error: ' + err.message;
+        });
+    }
+// Function to show the name input if "Add New" is selected
+function toggleNewProductFields() {
+    const selection = document.getElementById('prodID').value;
+    const nameGroup = document.getElementById('newNameGroup');
+    nameGroup.style.display = (selection === 'NEW') ? 'block' : 'none';
+}
+
+function savePrice() {
+    const selectValue = document.getElementById('prodID').value;
+    const newName = document.getElementById('newProdName').value;
+    const cur = parseInt(document.getElementById('curPrice').value);
+    const old = parseInt(document.getElementById('oldPrice').value);
+    const img = document.getElementById('imgURL').value;
+    const desc = document.getElementById('prodDesc').value;
+    const status = document.getElementById('status');
+
+    // 1. Determine the Document ID
+    let finalID = selectValue;
+    if (selectValue === 'NEW') {
+        if (!newName) { status.innerHTML = '❌ Name required'; return; }
+        // Create a URL-friendly ID (e.g., "Misty Rose" -> "misty-rose")
+        finalID = newName.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    if (!finalID || !cur || !old) {
+        status.innerHTML = '<span style="color: #ff7675;">❌ Enter required fields</span>';
+        return;
+    }
+
+    status.innerHTML = "⏳ Syncing Cloud...";
+
+    // 2. Save all fields to Firebase
+    db.collection('products').doc(finalID).set({
+        currentPrice: cur,
+        oldPrice: old,
+        image: img || 'many.jpg', // Fallback to your many.jpg
+        description: desc || 'Premium fragrance from Jojo Collections.',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true })
+    .then(() => {
+        status.innerHTML = '<span style="color: #55efc4;">✅ Product Live!</span>';
+        // Reset form
+        document.getElementById('newProdName').value = '';
+        document.getElementById('curPrice').value = '';
+        document.getElementById('oldPrice').value = '';
+        document.getElementById('imgURL').value = '';
+        document.getElementById('prodDesc').value = '';
+        setTimeout(() => { status.innerHTML = ''; }, 3000);
+    })
+    .catch(err => {
+        status.innerHTML = '❌ Error: ' + err.message;
+    });
+}    
+</script>
+
+</body>
+</html>

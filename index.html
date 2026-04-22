@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHOP</title>
+    <!-- font awesome cdn link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- header section starts -->
+    <header>
+        <input type="checkbox" name="" id="toggler">
+        <label for="toggler" class="fas fa-bars"></label>
+        <a href="#" class="logo">Jojo Collections<span>.</span></a>
+        <nav class="navbar">
+            <a href="#home">home</a>
+            <a href="#about">about</a>
+            <a href="#products">products</a>
+            <a href="#review">review</a>
+            <a href="#contact">contact</a>
+            <a href="admin.html" font-weight: bold;">admin</a>
+        </nav>
+        <div class="icons">
+            <a href="#" class="fas fa-heart"></a>
+            <a href="#" class="fas fa-shopping-cart"></a>
+            <a href="#" class="fas fa-user"></a>
+        </div>
+    </header>
+    <!-- header section ends -->
+
+    <!-- home section starts -->
+    <section class="home" id="home">
+        <div class="content">
+            <h3>fresh fragrances</h3>
+            <span> misty & oil fragrances </span>
+            <p>Trusted with your Elegance</p>
+            <form action="https://formspree.io/f/mvzdqbdb" 
+method="POST">
+     <input type="hidden" name="cart_items" Id="cart-data" value="no items selected">
+             <button type="submit" class="btn">shop now</button>
+        </form>
+        </div>
+    </section>
+    <!-- home section ends -->
+
+    <!-- about section starts -->
+    <section class="about" id="about">
+        <h1 class="heading"> <span> about </span> us </h1>
+        <div class="row">
+            <div class="video-container">
+                <video src="red perfume(MP4).mp4" loop autoplay muted></video>
+                <h3>best fragrance sellers</h3>
+            </div>
+            <div class="content">
+                <h3>why choose us?</h3>
+                <p>“Scent your presence with us”</p>
+                <p>At Jojo Collections, we make smelling exceptional effortless. Our high quality, long-lasting fragrances are crafted to leave a lasting impression often before you say a word. We blend elegance with a touch of personality, so you can feel confident, refined, and unmistakably memorable ever</p>
+                <a href="#" class="btn">learn more</a>
+            </div>
+        </div>
+    </section>
+    <!-- about section ends -->
+
+    <!-- icons section starts -->
+     <sections class="icons-container">
+        <div class="icons">
+            <img src="delivery.gif" alt="">
+            <div class="info">
+                <h3>free delivery</h3>
+                <span>on all orders</span>
+            </div>
+        </div>
+         <div class="icons">
+            <img src="guarantee.png" alt="">
+            <div class="info">
+                <h3>10 days returns</h3>
+                <span>money back guarantee</span>
+            </div>
+        </div>
+         <div class="icons">
+            <img src="dollar2.gif" alt="">
+            <div class="info">
+                <h3>offer & gifts</h3>
+                <span>on all orders</span>
+            </div>
+        </div>
+         <div class="icons">
+            <img src="secure.png" alt="">
+            <div class="info">
+                <h3>secure payment</h3>
+                <span>protected by paypal</span>
+            </div>
+        </div>
+     </sections>
+    <!-- icons section ends -->
+
+    <!-- products section starts -->
+     <section class="products" id="products">
+        <h1 class="heading"> latest <span>products</span></h1>
+        <div class="box-container" id="product-list"></div>
+     </section>
+    <!-- products section ends -->
+    
+    <!-- review section starts -->
+     <section class="review" id="review">
+        <h1 class="heading"> customer's <span>review</span></h1>
+        <div class="box-container review-container"></div>
+      <div class="box" style="margin-top: 2rem; background: #fff; padding: 2rem; border-radius: .5rem; box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);">
+    <form id="add-review-form">
+        <h3 style="font-size: 2rem; color: #333;">Leave a Review</h3>
+        <input type="text" name="name" placeholder="your name" required style="width:100%; margin:1rem 0; padding:1.2rem; font-size:1.6rem; border:1px solid #ccc;">
+        <textarea name="comment" placeholder="your comment" required style="width:100%; margin:1rem 0; padding:1.2rem; font-size:1.6rem; border:1px solid #ccc; height:10rem;"></textarea>
+        <button type="submit" class="btn">Post Review</button>
+    </form>
+</div>
+     </section>
+    <!-- review section ends -->
+    <!-- contact section starts -->
+     <section class="contact" id="contact">
+        <h1 class="heading"> <span> contact </span> us</h1>
+        <div class="row">
+            <form action="https://formspree.io/f/mvzdqbdb" method="POST">
+                <input type="text" placeholder="name" name="name" class="box">
+                <input type="email" placeholder="email" class="box">
+                <input type="number" placeholder="number" name="phone"class="box">
+                <textarea name="message" class="box" placeholder="message" id="" cols="30" rows="10">
+                </textarea>
+                <input type="submit" value="send message" class="btn">
+            </form>
+            <div class="image">
+                <img src="Jojo.jpg" alt="">
+            </div>
+        </div>
+     </section>
+    <!-- contact section ends -->
+
+    <!-- footer section starts -->
+    <section class="footer">
+     <div class="box-container">
+        <div class="box">
+            <h3>quick links</h3>
+            <a href="#">home</a>
+            <a href="#">about</a>
+            <a href="#">products</a>
+            <a href="#">review</a>
+            <a href="#">contact</a>
+        </div>
+        <div class="box">
+            <h3>extra links</h3>
+            <a href="#">my account</a>
+            <a href="#">my order</a>
+            <a href="#">my favorite</a>
+        </div>
+          <div class="box">
+            <h3>locations</h3>
+            <a href="#">Jinja</a>
+            <a href="#">Lugazi</a>
+            <a href="#">Mukono</a>
+            <a href="#">Kampala</a>
+        </div>
+          <div class="box">
+            <h3>contact info</h3>
+            <a href="#">+256-748304238</a>
+            <a href="#">amahjoy198@gmail.com</a>
+            <a href="#">Lugazi, Uganda</a>
+            <img src="bar-down.png" alt="">
+        </div>
+     </div>
+     <div class="credit"> created by <span> Jojo collections </span> | all rights reserved </div>
+    </section>
+    <!-- footer section ends -->
+
+    <!-- script starts -->
+     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA9ER2RfVM4Iw7Ka6eQ100KDnbuFI31_pg",
+  authDomain: "jojo-collection.firebaseapp.com",
+  projectId: "jojo-collection",
+  storageBucket: "jojo-collection.firebasestorage.app",
+  messagingSenderId: "469101720449",
+  appId: "1:469101720449:web:c668b39259ea141f69ee80",
+  measurementId: "G-J9B2NQ19P5"
+};
+
+  // 3. This line actually "turns on" the connection
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  
+
+    let cart = [];
+    const cartInput = document.getElementById('cart-data');
+
+    document.querySelectorAll('.add-btn').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // 1. Get or Ask for Phone Number
+        let phoneNumber = localStorage.getItem('customerPhone');
+
+        if (!phoneNumber) {
+            phoneNumber = prompt("Please enter your phone number to start your order:");
+            if (phoneNumber) {
+                localStorage.setItem('customerPhone', phoneNumber);
+                alert("Number saved! Tap 'Shop Now' (the cart icon) when you finish choosing items.");
+            } else {
+                return; 
+            }
+        }
+
+        // 2. Logic to find the product
+        const productBox = link.closest('.box');
+        const productName = productBox.querySelector('.content h3').innerText;
+
+        cart.push(productName);
+        
+        // 3. Update the hidden form with the number + items
+        cartInput.value = `Customer: ${phoneNumber} | Order: ` + cart.join(', ');
+
+        alert(productName + " added to cart!");
+    });
+});
+
+   // This tells the site: "Whenever a review is added to the 'reviews' collection, update the page"
+db.collection('reviews').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+    let html = '';
+    snapshot.docs.forEach(doc => {
+        const review = doc.data();
+        html += `
+            <div class="box">
+                <img src="many.jpg" alt="">
+                <h3>${review.name}</h3>
+                <p>${review.message}</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>`;
+    });
+    document.querySelector('.review-container').innerHTML = html;
+});
+    const reviewForm = document.querySelector('#add-review-form');
+
+    // SAVE TO FIREBASE
+    reviewForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        db.collection('reviews').add({
+            name: reviewForm.name.value,
+            message: reviewForm.comment.value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            reviewForm.reset();
+            alert("Thank you, Levi! Your review is live.");
+        });
+    });
+
+    // SHOW FROM FIREBASE
+    db.collection('reviews').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+        let html = '';
+snapshot.docs.forEach(doc => {
+    const review = doc.data();
+    html += `
+        <div class="box">
+            <div class="stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p>${review.message}</p>
+            <div class="user">
+                <img src="many.jpg" alt="Profile Picture" class="profile-pic">
+                <div class="user-info">
+                    <h3>${review.name}</h3>
+                    <span>Happy Customer</span>
+                </div>
+            </div>
+        </div>`;
+});  document.querySelector('.review-container').innerHTML = html;
+    });
+// 1. Point to your products collection
+const productContainer = document.querySelector('.products .box-container');
+
+db.collection('products').onSnapshot((snapshot) => {
+    let html = '';
+    
+    snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const id = doc.id; // This is 'mouth-spray', etc.
+
+        // 2. The Auto-Discount Math
+        let discountBadge = '';
+        if (data.oldPrice > data.currentPrice) {
+            const perc = Math.round(((data.oldPrice - data.currentPrice) / data.oldPrice) * 100);
+            discountBadge = `<span class="discount">-${perc}%</span>`;
+        }
+
+        // 3. Build the Box (Matches your exact style.css)
+        html += `
+            <div class="box">
+                ${discountBadge}
+                <div class="image">
+                    <img src="${data.image || id + '.jpg'}" alt="">
+                    <div class="icons">
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="cart-btn">add to cart</a>
+                        <a href="#" class="fas fa-share"></a>
+                    </div>
+                </div>
+                <div class="content">
+                    <h3>${id.replace(/-/g, ' ')}</h3>
+                    <p style="font-size: 1.3rem; color: #666; margin: 1rem 0;">${data.description || ''}</p>
+                    <div class="price"> 
+                        Ugx <span class="current-price">${data.currentPrice}</span> 
+                        <span>Ugx <span class="old-price">${data.oldPrice}</span></span>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    productContainer.innerHTML = html;
+});
+</script>
+
+  <!-- script ends -->
+</body>
+</html>
