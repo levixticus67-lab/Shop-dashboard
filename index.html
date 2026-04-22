@@ -197,7 +197,7 @@ const firebaseConfig = {
     let cart = [];
     const cartInput = document.getElementById('cart-data');
 
-    document.querySelectorAll('.add-btn').forEach(link => {
+    document.querySelectorAll('.cart-btn').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
 
@@ -208,7 +208,7 @@ const firebaseConfig = {
             phoneNumber = prompt("Please enter your phone number to start your order:");
             if (phoneNumber) {
                 localStorage.setItem('customerPhone', phoneNumber);
-                alert("Number saved! Tap 'Shop Now' (the cart icon) when you finish choosing items.");
+                alert("Number saved! Tap 'Shop Now' when you finish choosing items.");
             } else {
                 return; 
             }
@@ -217,7 +217,7 @@ const firebaseConfig = {
         // 2. Logic to find the product
         const productBox = link.closest('.box');
         const productName = productBox.querySelector('.content h3').innerText;
-        const productDesc = productBox.querySelector('.content p')?.innerText || "";
+        const productDesc = productBox.querySelector('.content p')?.innerText || "No description";
 
         cart.push(`${productName} (${productDesc})`);
         
