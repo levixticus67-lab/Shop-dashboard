@@ -197,9 +197,13 @@ const firebaseConfig = {
     let cart = [];
     const cartInput = document.getElementById('cart-data');
 
-    document.querySelectorAll('.cart-btn').forEach(link => {
-    link.addEventListener('click', (e) => {
+    // Use Event Delegation to catch clicks on buttons that are added later
+document.querySelector('.products .box-container').addEventListener('click', (e) => {
+    // Check if what was clicked is the cart button or the icon inside it
+    if (e.target.classList.contains('cart-btn') || e.target.parentElement.classList.contains('cart-btn')) {
         e.preventDefault();
+        
+        const link = e.target.closest('.cart-btn');
 
         // 1. Get or Ask for Phone Number
         let phoneNumber = localStorage.getItem('customerPhone');
@@ -208,7 +212,7 @@ const firebaseConfig = {
             phoneNumber = prompt("Please enter your phone number to start your order:");
             if (phoneNumber) {
                 localStorage.setItem('customerPhone', phoneNumber);
-                alert("Number saved! Tap 'Shop Now' when you finish choosing items.");
+                alert("Number saved! Tap the shop icon when you finish choosing items.");
             } else {
                 return; 
             }
@@ -217,15 +221,14 @@ const firebaseConfig = {
         // 2. Logic to find the product
         const productBox = link.closest('.box');
         const productName = productBox.querySelector('.content h3').innerText;
-        const productDesc = productBox.querySelector('.content p')?.innerText || "No description";
-
-        cart.push(`${productName} (${productDesc})`);
         
-        // 3. Update the hidden form with the number + items
+        cart.push(productName);
+        
+        // 3. Update the hidden form
         cartInput.value = `Customer: ${phoneNumber} | Order: ` + cart.join(', ');
 
         alert(productName + " added to cart!");
-    });
+    }
 });
 
    // This tells the site: "Whenever a review is added to the 'reviews' collection, update the page"
