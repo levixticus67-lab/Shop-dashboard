@@ -16,12 +16,13 @@
             margin: 0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             font-family: 'Segoe UI', sans-serif;
             /* Animated Mesh Gradient Background */
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #581c87 100%);
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         /* Floating background shapes for extra glass effect depth */
@@ -212,8 +213,11 @@
     </div>
 
     <div class="input-group">
-        <i class="fas fa-image"></i>
-        <input type="text" id="imgURL" placeholder="Image URL (e.g. many.jpg)">
+        <i class="fas fa-camera"></i>
+        <input type="file" id="imageFile" accept="image/*" style="padding-top: 12px;">
+    </div>
+    <div id="upload-progress" style="color: #55efc4; font-size: 0.8rem; margin-bottom: 15px; display: none;">
+        Uploading image... 0%
     </div>
 
     <div class="input-group">
@@ -227,8 +231,20 @@
 
     <div id="status"></div>
 </div>
+<div class="admin-card" style="margin-top: 3rem; width: 90%; max-width: 450px;">
+    <h2 style="color: #fff; margin-bottom: 1.5rem; font-size: 2rem;">
+        <i class="fas fa-shopping-bag" style="color: var(--pink); margin-right: 10px;"></i>Incoming Orders
+    </h2>
+    <div id="orders-list" style="color: #fff; max-height: 400px; overflow-y: auto;">
+        <p style="opacity: 0.6; text-align: center;">Waiting for orders...</p>
+    </div>
+    <h2 style="margin-top: 40px; color: var(--pink);">Manage Reviews</h2>
+    <div id="admin-reviews-list" style="text-align: left; margin-top: 20px;">
+    </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compact.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -270,6 +286,7 @@ const firebaseConfig = {
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     function savePrice() {
         const id = document.getElementById('prodID').value;
@@ -304,12 +321,12 @@ function toggleNewProductFields() {
     nameGroup.style.display = (selection === 'NEW') ? 'block' : 'none';
 }
 
-function savePrice() {
+async function savePrice() {
     const selectValue = document.getElementById('prodID').value;
     const newName = document.getElementById('newProdName').value;
     const cur = parseInt(document.getElementById('curPrice').value);
     const old = parseInt(document.getElementById('oldPrice').value);
-    const img = document.getElementById('imgURL').value;
+    const fileInput = document.getElementById('imageFile'); // Ensure you updated the UI to use id="imageFile"
     const desc = document.getElementById('prodDesc').value;
     const status = document.getElementById('status');
 
@@ -317,7 +334,6 @@ function savePrice() {
     let finalID = selectValue;
     if (selectValue === 'NEW') {
         if (!newName) { status.innerHTML = '❌ Name required'; return; }
-        // Create a URL-friendly ID (e.g., "Misty Rose" -> "misty-rose")
         finalID = newName.toLowerCase().replace(/\s+/g, '-');
     }
 
@@ -326,30 +342,111 @@ function savePrice() {
         return;
     }
 
-    status.innerHTML = "⏳ Syncing Cloud...";
+    status.innerHTML = "⏳ Uploading Image...";
 
-    // 2. Save all fields to Firebase
+    let finalImageUrl = "many.jpg"; // Default fallback
+
+    // 2. Handle the Image Upload to Firebase Storage
+    if (fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const storageRef = storage.ref(`products/${finalID}`);
+        
+        try {
+            const uploadTask = await storageRef.put(file);
+            finalImageUrl = await uploadTask.ref.getDownloadURL();
+            status.innerHTML = "⏳ Saving Product Details...";
+        } catch (error) {
+            status.innerHTML = "❌ Upload failed: " + error.message;
+            return;
+        }
+    }
+
+    // 3. Save all fields to Firestore
     db.collection('products').doc(finalID).set({
         currentPrice: cur,
         oldPrice: old,
-        image: img || 'many.jpg', // Fallback to your many.jpg
+        image: finalImageUrl,
         description: desc || 'Premium fragrance from Jojo Collections.',
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true })
     .then(() => {
         status.innerHTML = '<span style="color: #55efc4;">✅ Product Live!</span>';
         // Reset form
+        if(fileInput) fileInput.value = '';
         document.getElementById('newProdName').value = '';
         document.getElementById('curPrice').value = '';
         document.getElementById('oldPrice').value = '';
-        document.getElementById('imgURL').value = '';
         document.getElementById('prodDesc').value = '';
         setTimeout(() => { status.innerHTML = ''; }, 3000);
     })
     .catch(err => {
         status.innerHTML = '❌ Error: ' + err.message;
     });
-}    
+}
+
+   
+
+// Load Orders
+db.collection('orders').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    const ordersList = document.getElementById('orders-list');
+    ordersList.innerHTML = '';
+
+    if (snapshot.empty) {
+        ordersList.innerHTML = '<p>No orders yet!</p>';
+        return;
+    }
+
+    snapshot.forEach((doc) => {
+        const order = doc.data();
+        const date = new Date(order.createdAt).toLocaleDateString();
+        
+        ordersList.innerHTML += `
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>Phone: ${order.phone}</strong>
+                    <span>${date}</span>
+                </div>
+                <p style="margin: 0.5rem 0;">Items: ${order.items.map(i => i.name).join(', ')}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--pink); font-weight: bold;">Total: Ugx ${order.total.toLocaleString()}</span>
+                    <button onclick="deleteOrder('${doc.id}')" style="background: none; color: #ff7675; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    });
+});
+
+// Function to clear orders once fulfilled
+window.deleteOrder = function(id) {
+    if(confirm("Mark this order as completed and delete?")) {
+        db.collection('orders').doc(id).delete()
+        .then(() => {
+            console.log("Order deleted!");
+        })
+        .catch((error) => {
+            console.error("Error removing order: ",
+error);
+        });
+    }
+}
+
+db.collection('reviews').onSnapshot(snapshot => {
+    const list = document.getElementById('admin-reviews-list');
+    list.innerHTML = '';
+    snapshot.docs.forEach(doc => {
+        const rev = doc.data();
+        list.innerHTML += `
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>${rev.name} (${rev.rating}⭐)</strong><br>
+                    <span>${rev.comment.substring(0, 30)}...</span>
+                </div>
+                <button onclick="db.collection('reviews').doc('${doc.id}').delete()" style="background:none; color:#ff7675; cursor:pointer;"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+    });
+});
+
 </script>
 
 </body>
