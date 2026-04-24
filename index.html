@@ -432,7 +432,7 @@ window.checkout = function() {
         phone: customerPhone,
         total: window.cart.reduce((sum, item) => sum + item.price, 0),
         status: "Pending", // Default status
-        createdAt: new Date().toISOString()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     // Save to Firebase
