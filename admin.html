@@ -435,17 +435,22 @@ db.collection('reviews').onSnapshot(snapshot => {
     list.innerHTML = '';
     snapshot.docs.forEach(doc => {
         const rev = doc.data();
+        // Use || to handle different field names (comment vs message)
+        const displayComment = rev.comment || rev.message || "No text";
+        const displayRating = rev.rating || "N/A";
+        
         list.innerHTML += `
             <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <strong>${rev.name} (${rev.rating}⭐)</strong><br>
-                    <span>${rev.comment.substring(0, 30)}...</span>
+                    <strong>${rev.name} (${displayRating}⭐)</strong><br>
+                    <span>${displayComment.substring(0, 30)}...</span>
                 </div>
                 <button onclick="db.collection('reviews').doc('${doc.id}').delete()" style="background:none; color:#ff7675; cursor:pointer;"><i class="fas fa-trash"></i></button>
             </div>
         `;
     });
 });
+
 
 </script>
 
