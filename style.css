@@ -35,6 +35,7 @@ header .logo{
     font-size: 3rem;
     color: #333;
     font-weight: bolder;
+
 }
 header .logo span{
     color: var(--pink)
@@ -107,18 +108,22 @@ section{
 }
 .home .content h3{
     font-size: 6rem;
-    color: #333;
+    color: #000000;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0px var(--pink), 4px 4px 10px rgba(0,0,0,0.4);
 }
 .home .content span{
     font-size: 3.5rem;
-    color: var(--pink);
+    color: #d4af37;
     padding: 1rem 0;
     line-height: 1.5;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5)
 }
 .home .content p{
     font-size: 1.5rem;
-    color: #999;
-     padding: 1rem 0;
+    color: #111111;
+    padding: 1rem 0;
+    text-shadow: 1px 1px 3px #fff;
     line-height: 1.5;
 }
 .about .row{
@@ -431,6 +436,100 @@ section{
     margin: 1rem 0;
     width: 100%;
 }
+/* --- CART SIDEBAR (GLASSMORPHISM) --- */
+.cart-sidebar {
+    position: fixed;
+    top: 0; 
+    right: -105%; /* Hidden off-screen */
+    height: 100%;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.15); /* Translucent white */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 5000; /* Stays above everything */
+    padding: 2rem;
+    transition: 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+}
+
+.cart-sidebar.active {
+    right: 0;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    color: var(--black);
+}
+
+#cart-items-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.4);
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.cart-total-section {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.checkout-btn {
+    width: 100%;
+    margin-top: 1rem;
+    background: var(--pink);
+    color: #fff;
+    padding: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.7rem;
+    text-align: center;
+}
+.filter-btn {
+    padding: 0.8rem 2rem;
+    border: 0.2rem solid var(--pink);
+    border-radius: 5rem;
+    background: transparent;
+    color: var(--pink);
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: 0.3s;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: var(--pink);
+    color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
