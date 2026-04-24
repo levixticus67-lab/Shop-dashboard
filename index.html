@@ -30,6 +30,22 @@
         </div>
     </header>
     <!-- header section ends -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2 style="font-size: 2.5rem;">My Bag</h2>
+        <i class="fas fa-times" id="close-cart" style="font-size: 2.5rem; cursor: pointer;"></i>
+    </div>
+    
+    <div id="cart-items-container">
+        </div>
+
+    <div class="cart-total-section">
+        <h3 style="font-size: 2rem;">Total: Ugx <span id="cart-total-amount">0</span></h3>
+        <div class="checkout-btn" onclick="checkout()">Checkout Order</div>
+    </div>
+</div>
+
+
 
     <!-- home section starts -->
     <section class="home" id="home">
@@ -99,6 +115,19 @@ method="POST">
 
     <!-- products section starts -->
      <section class="products" id="products">
+        <div class="search-container" style="margin-bottom: 3rem; text-align: center;">
+    <div class="search-box" style="display: inline-flex; align-items: center; background: #fff; padding: 10px 20px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 500px;">
+        <i class="fas fa-search" style="color: var(--pink); margin-right: 10px;"></i>
+        <input type="text" id="searchInput" placeholder="Search for a scent..." style="border: none; outline: none; width: 100%; font-size: 1.6rem;" onkeyup="filterProducts()">
+    </div>
+    
+    <div class="category-filters" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="filter-btn active" onclick="setCategory('all')">All</button>
+        <button class="filter-btn" onclick="setCategory('perfumes')">Perfumes</button>
+        <button class="filter-btn" onclick="setCategory('humidifier')">Humidifiers</button>
+        <button class="filter-btn" onclick="setCategory('body-splash')">Splash</button>
+    </div>
+</div>
         <h1 class="heading"> latest <span>products</span></h1>
         <div class="box-container" id="product-list"></div>
      </section>
@@ -106,17 +135,31 @@ method="POST">
     
     <!-- review section starts -->
      <section class="review" id="review">
-        <h1 class="heading"> customer's <span>review</span></h1>
-        <div class="box-container review-container"></div>
-      <div class="box" style="margin-top: 2rem; background: #fff; padding: 2rem; border-radius: .5rem; box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);">
-    <form id="add-review-form">
-        <h3 style="font-size: 2rem; color: #333;">Leave a Review</h3>
-        <input type="text" name="name" placeholder="your name" required style="width:100%; margin:1rem 0; padding:1.2rem; font-size:1.6rem; border:1px solid #ccc;">
-        <textarea name="comment" placeholder="your comment" required style="width:100%; margin:1rem 0; padding:1.2rem; font-size:1.6rem; border:1px solid #ccc; height:10rem;"></textarea>
-        <button type="submit" class="btn">Post Review</button>
-    </form>
-</div>
-     </section>
+    <h1 class="heading"> customer's <span>review</span></h1>
+    
+    <div class="box-container review-container" id="reviews-list"></div>
+
+    <div class="box" style="margin-top: 5rem; background: #fff; padding: 3rem; border-radius: 1.5rem; box-shadow: 0 .5rem 1rem rgba(0,0,0,.1); max-width: 600px; margin-left: auto; margin-right: auto;">
+        <form id="add-review-form">
+            <h3 style="font-size: 2.5rem; color: #333; margin-bottom: 2rem; text-align: center;">Share Your Experience</h3>
+            
+            <input type="text" id="revName" placeholder="Your Name" required style="width: 100%; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.6rem;">
+            
+            <select id="revRating" style="width: 100%; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.6rem; color: #666;">
+                <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                <option value="4">⭐⭐⭐⭐ (Great)</option>
+                <option value="3">⭐⭐⭐ (Average)</option>
+                <option value="2">⭐⭐ (Poor)</option>
+                <option value="1">⭐ (Very Bad)</option>
+            </select>
+            
+            <textarea id="revComment" placeholder="Tell us about the scent..." required style="width: 100%; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.6rem; height: 120px; resize: none;"></textarea>
+            
+            <button type="submit" class="btn" style="width: 100%; border-radius: .5rem;">Post Review</button>
+        </form>
+        <div id="review-status" style="margin-top: 1rem; text-align: center; font-size: 1.4rem;"></div>
+    </div>
+</section>
     <!-- review section ends -->
     <!-- contact section starts -->
      <section class="contact" id="contact">
@@ -315,7 +358,8 @@ db.collection('products').onSnapshot((snapshot) => {
                     <img src="${data.image || id + '.jpg'}" alt="">
                     <div class="icons">
                         <a href="#" class="fas fa-heart"></a>
-                        <a href="#" class="cart-btn">add to cart</a>
+                        <a href="javascript:void(0)" class="cart-btn"
+                         onclick="addToCart('${id.replace(/-/g, '')}', ${data.currentPrice})">add to cart</a>
                         <a href="#" class="fas fa-share"></a>
                     </div>
                 </div>
@@ -332,6 +376,184 @@ db.collection('products').onSnapshot((snapshot) => {
 
     productContainer.innerHTML = html;
 });
+
+// --- JOJO'S GLASS CART LOGIC ---
+window.cart = []; 
+
+window.addToCart = function(name, price) {
+    window.cart.push({ name, price: parseInt(price) });
+    updateCartUI();
+    document.getElementById('cart-sidebar').classList.add('active');
+};
+
+window.removeFromCart = function(index) {
+    window.cart.splice(index, 1);
+    updateCartUI();
+};
+
+function updateCartUI() {
+    const container = document.getElementById('cart-items-container');
+    const totalDisplay = document.getElementById('cart-total-amount');
+    container.innerHTML = '';
+    let total = 0;
+
+    window.cart.forEach((item, index) => {
+        total += item.price;
+        container.innerHTML += `
+            <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.4); margin-bottom: 1rem; border-radius: 10px;">
+                <div>
+                    <p style="font-weight: bold; font-size: 1.4rem; color: #333;">${item.name}</p>
+                    <p style="color: #e84393; font-weight: bold;">Ugx ${item.price.toLocaleString()}</p>
+                </div>
+                <i class="fas fa-trash" onclick="removeFromCart(${index})" style="cursor:pointer; color: #ff7675; font-size: 1.5rem;"></i>
+            </div>`;
+    });
+    totalDisplay.innerText = total.toLocaleString();
+}
+
+// Open/Close Listeners
+document.querySelector('.fa-shopping-cart').onclick = (e) => {
+    e.preventDefault();
+    document.getElementById('cart-sidebar').classList.add('active');
+};
+
+document.getElementById('close-cart').onclick = () => {
+    document.getElementById('cart-sidebar').classList.remove('active');
+};
+
+window.checkout = function() {
+    if(window.cart.length === 0) return alert("Your bag is empty!");
+
+    const customerPhone = prompt("Enter your Phone Number for delivery:");
+    if(!customerPhone) return alert("Phone number is required to order!");
+
+    const orderData = {
+        items: window.cart,
+        phone: customerPhone,
+        total: window.cart.reduce((sum, item) => sum + item.price, 0),
+        status: "Pending", // Default status
+        createdAt: new Date().toISOString()
+    };
+
+    // Save to Firebase
+    db.collection('orders').add(orderData)
+    .then(() => {
+        alert("✅ Order Placed! Jojo Collections will contact you shortly.");
+        window.cart = []; // Clear the cart
+        updateCartUI();
+        document.getElementById('cart-sidebar').classList.remove('active');
+    })
+    .catch((error) => {
+        console.error("Order Error: ", error);
+        alert("❌ Something went wrong. Try again!");
+    });
+};
+
+let allProducts = []; // To store local copy of data
+let currentCategory = 'all';
+
+// Update your existing database fetch to save a copy
+db.collection('products').onSnapshot((snapshot) => {
+    allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderProducts(allProducts); // Initial render
+});
+
+function renderProducts(productsToDisplay) {
+    const container = document.getElementById('product-container');
+    container.innerHTML = ''; // Clear current grid
+
+    productsToDisplay.forEach(product => {
+        container.innerHTML += `
+            <div class="box">
+                <span class="discount">-10%</span>
+                <div class="image">
+                    <img src="${product.image}" alt="">
+                    <div class="icons">
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="cart-btn" onclick="addToCart('${product.id}', '${product.id}', ${product.currentPrice})">add to cart</a>
+                        <a href="#" class="fas fa-share"></a>
+                    </div>
+                </div>
+                <div class="content">
+                    <h3>${product.id.replace(/-/g, ' ')}</h3>
+                    <div class="price"> Ugx ${product.currentPrice.toLocaleString()} <span>Ugx ${product.oldPrice.toLocaleString()}</span> </div>
+                </div>
+            </div>`;
+    });
+}
+
+function filterProducts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    const filtered = allProducts.filter(p => {
+        const matchesSearch = p.id.toLowerCase().includes(searchTerm);
+        const matchesCategory = (currentCategory === 'all' || p.id.includes(currentCategory));
+        return matchesSearch && matchesCategory;
+    });
+
+    renderProducts(filtered);
+}
+
+function setCategory(cat) {
+    currentCategory = cat;
+    
+    // UI: Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    filterProducts(); // Re-run filtering
+}
+
+// 1. Listen for new reviews and display them
+db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    const reviewList = document.getElementById('reviews-list');
+    reviewList.innerHTML = ''; // Clear old reviews
+
+    snapshot.docs.forEach(doc => {
+        const rev = doc.data();
+        const stars = '⭐'.repeat(rev.rating); // Turn number into stars
+        
+        reviewList.innerHTML += `
+            <div class="box">
+                <img src="quote-img.png" alt="" class="quote">
+                <p>${rev.comment}</p>
+                <div class="user">
+                    <img src="user-placeholder.png" alt="">
+                    <div class="user-info">
+                        <h3>${rev.name}</h3>
+                        <span>happy customer</span>
+                        <div class="stars" style="color: var(--pink); font-size: 1.5rem;">${stars}</div>
+                    </div>
+                </div>
+            </div>`;
+    });
+});
+
+// 2. Handle the "Submit Review" button
+document.getElementById('add-review-form').onsubmit = (e) => {
+    e.preventDefault();
+    const status = document.getElementById('review-status');
+    
+    const reviewData = {
+        name: document.getElementById('revName').value,
+        rating: parseInt(document.getElementById('revRating').value),
+        comment: document.getElementById('revComment').value,
+        createdAt: new Date().toISOString()
+    };
+
+    status.innerHTML = "⏳ Posting...";
+
+    db.collection('reviews').add(reviewData)
+    .then(() => {
+        status.innerHTML = "✅ Thank you for your feedback!";
+        document.getElementById('add-review-form').reset();
+        setTimeout(() => { status.innerHTML = ''; }, 3000);
+    })
+    .catch(err => {
+        status.innerHTML = "❌ Error: " + err.message;
+    });
+};
+
 </script>
 
   <!-- script ends -->
