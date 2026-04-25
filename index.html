@@ -72,8 +72,8 @@ method="POST">
             </div>
             <div class="content">
                 <h3>why choose us?</h3>
-                <p>“Scent your presence with us”</p>
-                <p>At Jojo Collections, we make smelling exceptional effortless. Our high quality, long-lasting fragrances are crafted to leave a lasting impression often before you say a word. We blend elegance with a touch of personality, so you can feel confident, refined, and unmistakably memorable ever</p>
+                <p>"Scent your presence with us"</p>
+                <p>At Jojo Collections, we make smelling exceptional effortless. Our high quality, long-lasting fragrances are crafted to leave a lasting impression often before you say a word. We[...]
                 <a href="#" class="btn">learn more</a>
             </div>
         </div>
@@ -153,7 +153,7 @@ method="POST">
                 <option value="1">⭐ (Very Bad)</option>
             </select>
             
-            <textarea id="revComment" placeholder="Tell us about the scent..." required style="width: 100%; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.6rem; height: 120px; resize: none;"></textarea>
+            <textarea id="revComment" placeholder="Tell us about the scent..." required style="width: 100%; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #ddd; border-radius: .5rem; font-size: 1.6rem; height: 150px;"></textarea>
             
             <button type="submit" class="btn" style="width: 100%; border-radius: .5rem;">Post Review</button>
         </form>
@@ -221,7 +221,6 @@ method="POST">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA9ER2RfVM4Iw7Ka6eQ100KDnbuFI31_pg",
   authDomain: "jojo-collection.firebaseapp.com",
@@ -232,328 +231,202 @@ const firebaseConfig = {
   measurementId: "G-J9B2NQ19P5"
 };
 
-  // 3. This line actually "turns on" the connection
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   
-
     let cart = [];
     const cartInput = document.getElementById('cart-data');
 
-    // Use Event Delegation to catch clicks on buttons that are added later
-document.querySelector('.products .box-container').addEventListener('click', (e) => {
-    // Check if what was clicked is the cart button or the icon inside it
-    if (e.target.classList.contains('cart-btn') || e.target.parentElement.classList.contains('cart-btn')) {
-        e.preventDefault();
-        
-        const link = e.target.closest('.cart-btn');
+    document.querySelector('.products .box-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('cart-btn') || e.target.parentElement.classList.contains('cart-btn')) {
+            e.preventDefault();
+            
+            const link = e.target.closest('.cart-btn');
 
-        // 1. Get or Ask for Phone Number
-        let phoneNumber = localStorage.getItem('customerPhone');
+            let phoneNumber = localStorage.getItem('customerPhone');
 
-        if (!phoneNumber) {
-            phoneNumber = prompt("Please enter your phone number to start your order:");
-            if (phoneNumber) {
-                localStorage.setItem('customerPhone', phoneNumber);
-                alert("Number saved! Tap the shop icon when you finish choosing items.");
-            } else {
-                return; 
+            if (!phoneNumber) {
+                phoneNumber = prompt("Please enter your phone number to start your order:");
+                if (phoneNumber) {
+                    localStorage.setItem('customerPhone', phoneNumber);
+                    alert("Number saved! Tap the shop icon when you finish choosing items.");
+                } else {
+                    return; 
+                }
             }
+
+            const productBox = link.closest('.box');
+            const productName = productBox.querySelector('.content h3').innerText;
+            
+            cart.push(productName);
+            
+            cartInput.value = `Customer: ${phoneNumber} | Order: ` + cart.join(', ');
+
+            alert(productName + " added to cart!");
         }
-
-        // 2. Logic to find the product
-        const productBox = link.closest('.box');
-        const productName = productBox.querySelector('.content h3').innerText;
-        
-        cart.push(productName);
-        
-        // 3. Update the hidden form
-        cartInput.value = `Customer: ${phoneNumber} | Order: ` + cart.join(', ');
-
-        alert(productName + " added to cart!");
-    }
-});
-
-   // This tells the site: "Whenever a review is added to the 'reviews' collection, update the page"
-db.collection('reviews').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-    let html = '';
-    snapshot.docs.forEach(doc => {
-        const review = doc.data();
-        html += `
-            <div class="box">
-                <img src="many.jpg" alt="">
-                <h3>${review.name}</h3>
-                <p>${review.message}</p>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </div>
-            </div>`;
     });
-    document.querySelector('.review-container').innerHTML = html;
-});
-    const reviewForm = document.querySelector('#add-review-form');
 
-    // SAVE TO FIREBASE
-    reviewForm.addEventListener('submit', (e) => {
+    // Load Products
+    const productContainer = document.querySelector('.products .box-container');
+    
+    db.collection('products').onSnapshot((snapshot) => {
+        let html = '';
+        
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            const id = doc.id;
+
+            let discountBadge = '';
+            if (data.oldPrice > data.currentPrice) {
+                const perc = Math.round(((data.oldPrice - data.currentPrice) / data.oldPrice) * 100);
+                discountBadge = `<span class="discount">-${perc}%</span>`;
+            }
+
+            html += `
+                <div class="box">
+                    ${discountBadge}
+                    <div class="image">
+                        <img src="${data.image || id + '.jpg'}" alt="">
+                        <div class="icons">
+                            <a href="#" class="fas fa-heart"></a>
+                            <a href="javascript:void(0)" class="cart-btn"
+                             onclick="addToCart('${id.replace(/-/g, '')}', ${data.currentPrice})">add to cart</a>
+                            <a href="#" class="fas fa-share"></a>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <h3>${id.replace(/-/g, ' ')}</h3>
+                        <p style="font-size: 1.3rem; color: #666; margin: 1rem 0;">${data.description || ''}</p>
+                        <div class="price"> 
+                            Ugx <span class="current-price">${data.currentPrice.toLocaleString()}</span> 
+                            <span>Ugx <span class="old-price">${data.oldPrice.toLocaleString()}</span></span>
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        productContainer.innerHTML = html;
+    });
+
+    window.cart = []; 
+
+    window.addToCart = function(name, price) {
+        window.cart.push({ name, price: parseInt(price) });
+        updateCartUI();
+        document.getElementById('cart-sidebar').classList.add('active');
+    };
+
+    window.removeFromCart = function(index) {
+        window.cart.splice(index, 1);
+        updateCartUI();
+    };
+
+    function updateCartUI() {
+        const container = document.getElementById('cart-items-container');
+        const totalDisplay = document.getElementById('cart-total-amount');
+        container.innerHTML = '';
+        let total = 0;
+
+        window.cart.forEach((item, index) => {
+            total += item.price;
+            container.innerHTML += `
+                <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.4); margin-bottom: 1rem; border-radius: 10px;">
+                    <div>
+                        <p style="font-weight: bold; font-size: 1.4rem; color: #333;">${item.name}</p>
+                        <p style="color: #e84393; font-weight: bold;">Ugx ${item.price.toLocaleString()}</p>
+                    </div>
+                    <i class="fas fa-trash" onclick="removeFromCart(${index})" style="cursor:pointer; color: #ff7675; font-size: 1.5rem;"></i>
+                </div>`;
+        });
+        totalDisplay.innerText = total.toLocaleString();
+    }
+
+    document.querySelector('.fa-shopping-cart').onclick = (e) => {
         e.preventDefault();
-        db.collection('reviews').add({
-            name: reviewForm.name.value,
-            message: reviewForm.comment.value,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            reviewForm.reset();
-            alert("Thank you, Levi! Your review is live.");
+        document.getElementById('cart-sidebar').classList.add('active');
+    };
+
+    document.getElementById('close-cart').onclick = () => {
+        document.getElementById('cart-sidebar').classList.remove('active');
+    };
+
+    window.checkout = function() {
+        if(window.cart.length === 0) return alert("Your bag is empty!");
+
+        const customerPhone = prompt("Enter your Phone Number for delivery:");
+        if(!customerPhone) return alert("Phone number is required to order!");
+
+        const orderData = {
+            items: window.cart,
+            phone: customerPhone,
+            total: window.cart.reduce((sum, item) => sum + item.price, 0),
+            status: "Pending",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        db.collection('orders').add(orderData)
+        .then(() => {
+            alert("✅ Order Placed! Jojo Collections will contact you shortly.");
+            window.cart = [];
+            updateCartUI();
+            document.getElementById('cart-sidebar').classList.remove('active');
+        })
+        .catch((error) => {
+            console.error("Order Error: ", error);
+            alert("❌ Something went wrong. Try again!");
+        });
+    };
+
+    // FIXED: Reviews - Use consistent field name (comment)
+    db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        const reviewList = document.getElementById('reviews-list');
+        reviewList.innerHTML = '';
+
+        snapshot.docs.forEach(doc => {
+            const rev = doc.data();
+            const stars = '⭐'.repeat(rev.rating);
+            
+            reviewList.innerHTML += `
+                <div class="box">
+                    <div class="stars">
+                        ${stars}
+                    </div>
+                    <p>${rev.comment}</p>
+                    <div class="user">
+                        <img src="many.jpg" alt="Profile Picture" class="profile-pic">
+                        <div class="user-info">
+                            <h3>${rev.name}</h3>
+                            <span>happy customer</span>
+                        </div>
+                    </div>
+                </div>`;
         });
     });
 
-    // SHOW FROM FIREBASE
-    db.collection('reviews').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-        let html = '';
-snapshot.docs.forEach(doc => {
-    const review = doc.data();
-    html += `
-        <div class="box">
-            <div class="stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i>
-                <i class="fas fa-star"></i><i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-            </div>
-            <p>${review.message}</p>
-            <div class="user">
-                <img src="many.jpg" alt="Profile Picture" class="profile-pic">
-                <div class="user-info">
-                    <h3>${review.name}</h3>
-                    <span>Happy Customer</span>
-                </div>
-            </div>
-        </div>`;
-});  document.querySelector('.review-container').innerHTML = html;
-    });
-// 1. Point to your products collection
-const productContainer = document.querySelector('.products .box-container');
-
-db.collection('products').onSnapshot((snapshot) => {
-    let html = '';
-    
-    snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        const id = doc.id; // This is 'mouth-spray', etc.
-
-        // 2. The Auto-Discount Math
-        let discountBadge = '';
-        if (data.oldPrice > data.currentPrice) {
-            const perc = Math.round(((data.oldPrice - data.currentPrice) / data.oldPrice) * 100);
-            discountBadge = `<span class="discount">-${perc}%</span>`;
-        }
-
-        // 3. Build the Box (Matches your exact style.css)
-        html += `
-            <div class="box">
-                ${discountBadge}
-                <div class="image">
-                    <img src="${data.image || id + '.jpg'}" alt="">
-                    <div class="icons">
-                        <a href="#" class="fas fa-heart"></a>
-                        <a href="javascript:void(0)" class="cart-btn"
-                         onclick="addToCart('${id.replace(/-/g, '')}', ${data.currentPrice})">add to cart</a>
-                        <a href="#" class="fas fa-share"></a>
-                    </div>
-                </div>
-                <div class="content">
-                    <h3>${id.replace(/-/g, ' ')}</h3>
-                    <p style="font-size: 1.3rem; color: #666; margin: 1rem 0;">${data.description || ''}</p>
-                    <div class="price"> 
-                        Ugx <span class="current-price">${data.currentPrice}</span> 
-                        <span>Ugx <span class="old-price">${data.oldPrice}</span></span>
-                    </div>
-                </div>
-            </div>`;
-    });
-
-    productContainer.innerHTML = html;
-});
-
-// --- JOJO'S GLASS CART LOGIC ---
-window.cart = []; 
-
-window.addToCart = function(name, price) {
-    window.cart.push({ name, price: parseInt(price) });
-    updateCartUI();
-    document.getElementById('cart-sidebar').classList.add('active');
-};
-
-window.removeFromCart = function(index) {
-    window.cart.splice(index, 1);
-    updateCartUI();
-};
-
-function updateCartUI() {
-    const container = document.getElementById('cart-items-container');
-    const totalDisplay = document.getElementById('cart-total-amount');
-    container.innerHTML = '';
-    let total = 0;
-
-    window.cart.forEach((item, index) => {
-        total += item.price;
-        container.innerHTML += `
-            <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.4); margin-bottom: 1rem; border-radius: 10px;">
-                <div>
-                    <p style="font-weight: bold; font-size: 1.4rem; color: #333;">${item.name}</p>
-                    <p style="color: #e84393; font-weight: bold;">Ugx ${item.price.toLocaleString()}</p>
-                </div>
-                <i class="fas fa-trash" onclick="removeFromCart(${index})" style="cursor:pointer; color: #ff7675; font-size: 1.5rem;"></i>
-            </div>`;
-    });
-    totalDisplay.innerText = total.toLocaleString();
-}
-
-// Open/Close Listeners
-document.querySelector('.fa-shopping-cart').onclick = (e) => {
-    e.preventDefault();
-    document.getElementById('cart-sidebar').classList.add('active');
-};
-
-document.getElementById('close-cart').onclick = () => {
-    document.getElementById('cart-sidebar').classList.remove('active');
-};
-
-window.checkout = function() {
-    if(window.cart.length === 0) return alert("Your bag is empty!");
-
-    const customerPhone = prompt("Enter your Phone Number for delivery:");
-    if(!customerPhone) return alert("Phone number is required to order!");
-
-    const orderData = {
-        items: window.cart,
-        phone: customerPhone,
-        total: window.cart.reduce((sum, item) => sum + item.price, 0),
-        status: "Pending", // Default status
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    // Save to Firebase
-    db.collection('orders').add(orderData)
-    .then(() => {
-        alert("✅ Order Placed! Jojo Collections will contact you shortly.");
-        window.cart = []; // Clear the cart
-        updateCartUI();
-        document.getElementById('cart-sidebar').classList.remove('active');
-    })
-    .catch((error) => {
-        console.error("Order Error: ", error);
-        alert("❌ Something went wrong. Try again!");
-    });
-};
-
-let allProducts = []; // To store local copy of data
-let currentCategory = 'all';
-
-// Update your existing database fetch to save a copy
-db.collection('products').onSnapshot((snapshot) => {
-    allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderProducts(allProducts); // Initial render
-});
-
-function renderProducts(productsToDisplay) {
-    const container = document.getElementById('product-container');
-    container.innerHTML = ''; // Clear current grid
-
-    productsToDisplay.forEach(product => {
-        container.innerHTML += `
-            <div class="box">
-                <span class="discount">-10%</span>
-                <div class="image">
-                    <img src="${product.image}" alt="">
-                    <div class="icons">
-                        <a href="#" class="fas fa-heart"></a>
-                        <a href="#" class="cart-btn" onclick="addToCart('${product.id}', '${product.id}', ${product.currentPrice})">add to cart</a>
-                        <a href="#" class="fas fa-share"></a>
-                    </div>
-                </div>
-                <div class="content">
-                    <h3>${product.id.replace(/-/g, ' ')}</h3>
-                    <div class="price"> Ugx ${product.currentPrice.toLocaleString()} <span>Ugx ${product.oldPrice.toLocaleString()}</span> </div>
-                </div>
-            </div>`;
-    });
-}
-
-function filterProducts() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
-    const filtered = allProducts.filter(p => {
-        const matchesSearch = p.id.toLowerCase().includes(searchTerm);
-        const matchesCategory = (currentCategory === 'all' || p.id.includes(currentCategory));
-        return matchesSearch && matchesCategory;
-    });
-
-    renderProducts(filtered);
-}
-
-function setCategory(cat) {
-    currentCategory = cat;
-    
-    // UI: Update active button
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    filterProducts(); // Re-run filtering
-}
-
-// 1. Listen for new reviews and display them
-db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
-    const reviewList = document.getElementById('reviews-list');
-    reviewList.innerHTML = ''; // Clear old reviews
-
-    snapshot.docs.forEach(doc => {
-        const rev = doc.data();
-        const stars = '⭐'.repeat(rev.rating); // Turn number into stars
+    // Handle Review Submit - FIXED: Save with field name 'comment'
+    document.getElementById('add-review-form').onsubmit = (e) => {
+        e.preventDefault();
+        const status = document.getElementById('review-status');
         
-        reviewList.innerHTML += `
-            <div class="box">
-                <img src="quote-img.png" alt="" class="quote">
-                <p>${rev.comment}</p>
-                <div class="user">
-                    <img src="user-placeholder.png" alt="">
-                    <div class="user-info">
-                        <h3>${rev.name}</h3>
-                        <span>happy customer</span>
-                        <div class="stars" style="color: var(--pink); font-size: 1.5rem;">${stars}</div>
-                    </div>
-                </div>
-            </div>`;
-    });
-});
+        const reviewData = {
+            name: document.getElementById('revName').value,
+            rating: parseInt(document.getElementById('revRating').value),
+            comment: document.getElementById('revComment').value,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-// 2. Handle the "Submit Review" button
-document.getElementById('add-review-form').onsubmit = (e) => {
-    e.preventDefault();
-    const status = document.getElementById('review-status');
-    
-    const reviewData = {
-        name: document.getElementById('revName').value,
-        rating: parseInt(document.getElementById('revRating').value),
-        comment: document.getElementById('revComment').value,
-        createdAt: new Date().toISOString()
+        status.innerHTML = "⏳ Posting...";
+
+        db.collection('reviews').add(reviewData)
+        .then(() => {
+            status.innerHTML = "✅ Thank you for your feedback!";
+            document.getElementById('add-review-form').reset();
+            setTimeout(() => { status.innerHTML = ''; }, 3000);
+        })
+        .catch(err => {
+            status.innerHTML = "❌ Error: " + err.message;
+        });
     };
-
-    status.innerHTML = "⏳ Posting...";
-
-    db.collection('reviews').add(reviewData)
-    .then(() => {
-        status.innerHTML = "✅ Thank you for your feedback!";
-        document.getElementById('add-review-form').reset();
-        setTimeout(() => { status.innerHTML = ''; }, 3000);
-    })
-    .catch(err => {
-        status.innerHTML = "❌ Error: " + err.message;
-    });
-};
-
 </script>
 
   <!-- script ends -->
