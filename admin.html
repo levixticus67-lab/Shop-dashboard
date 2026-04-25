@@ -399,7 +399,7 @@ if (fileInput.files[0]) {
    
 
 // Load Orders
-db.collection('orders').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+db.collection('orders').onSnapshot((snapshot) => {
     const ordersList = document.getElementById('orders-list');
     ordersList.innerHTML = '';
 
