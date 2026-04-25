@@ -75,7 +75,7 @@
             color: var(--pink);
         }
 
-        select, input {
+        select, input, textarea {
             width: 100%;
             padding: 15px 15px 15px 45px;
             background: rgba(255, 255, 255, 0.05);
@@ -89,7 +89,7 @@
 
         select option { background: #1e1b4b; }
 
-        input:focus {
+        input:focus, textarea:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--pink);
             box-shadow: 0 0 15px rgba(232, 67, 147, 0.3);
@@ -125,10 +125,10 @@
             height: 20px;
         }
         .back-btn {
-            position: fixed; /* Keep it fixed so it stays in the corner */
+            position: fixed;
             top: 25px;
             left: 25px;
-            z-index: 10000; /* Higher than the login overlay */
+            z-index: 10000;
             padding: 12px 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -150,7 +150,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* Make it look good on your phone */
         @media (max-width: 480px) {
             .back-btn {
                 top: 15px;
@@ -166,309 +165,278 @@
         <i class="fas fa-arrow-left"></i>Back to Shop
     </a>
     <div id="login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center;">
-        <div class="glass-card" style="padding: 40px; text-align: center; border-radius: 20px; background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
-            <h2>Staff Access Only</h2>
+        <div class="glass-card" style="padding: 40px; text-align: center; border-radius: 20px; background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2);">
+            <h2 style="color: white;">Staff Access Only</h2>
             <input type="password" id="adminPass" placeholder="Enter Password" style="padding: 15px; border-radius: 10px; border: none; outline: none; width: 250px; margin-top: 10px;">
-            <button onclick="checkPass()" style="margin-top: 20px; padding: 12px 30px; background: #e84393; color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold;">Enter</button>
+            <button onclick="checkPass()" style="margin-top: 20px; padding: 12px 30px; background: #e84393; color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold;">Login</button>
             <p id="fail-msg" style="color: #ff7675; margin-top: 15px; font-size: 0.9rem;"></p>
         </div>
     </div>
 
     <div id="admin-content" style="display: none;">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+
+        <div class="admin-card">
+            <h1>JOJO</h1>
+            <p>PRODUCT MANAGEMENT</p>
+
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <select id="prodID" onchange="toggleNewProductFields()">
+                    <option value="">-- Select Product --</option>
+                    <option value="NEW">+ Add New Product</option>
+                    <option value="mouth-spray">Mouth Spray</option>
+                    <option value="humidifier">Humidifier</option>
+                    <option value="shower-gel">Shower Gel</option>
+                    <option value="body-splash">Body Splash</option>
+                    <option value="perfumes">Perfumes</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="newNameGroup" style="display:none;">
+                <i class="fas fa-pen-nib"></i>
+                <input type="text" id="newProdName" placeholder="Product Name (e.g. Misty Rose)">
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-coins"></i>
+                <input type="number" id="curPrice" placeholder="Selling Price (Ugx)">
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-history"></i>
+                <input type="number" id="oldPrice" placeholder="Original Price (Ugx)">
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-camera"></i>
+                <input type="file" id="imageFile" accept="image/*" style="padding-top: 12px;">
+            </div>
+            <div id="upload-progress" style="color: #55efc4; font-size: 0.8rem; margin-bottom: 15px; display: none;">
+                Uploading image... 0%
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-align-left"></i>
+                <textarea id="prodDesc" placeholder="Product Description..." style="padding-left: 45px; height: 100px; resize: vertical;"></textarea>
+            </div>
+
+            <button class="btn-update" onclick="savePrice()">
+                <i class="fas fa-cloud-upload-alt"></i> Upload to Shop
+            </button>
+
+            <div id="status"></div>
         </div>
 
-<div class="shape shape-1"></div>
-<div class="shape shape-2"></div>
-
-<div class="admin-card">
-    <h1>JOJO</h1>
-    <p>PRODUCT MANAGEMENT</p>
-
-    <div class="input-group">
-        <i class="fas fa-search"></i>
-        <select id="prodID" onchange="toggleNewProductFields()">
-            <option value="">-- Select Product --</option>
-            <option value="NEW">+ Add New Product</option>
-            <option value="mouth-spray">Mouth Spray</option>
-            <option value="humidifier">Humidifier</option>
-            <option value="shower-gel">Shower Gel</option>
-            <option value="body-splash">Body Splash</option>
-            <option value="perfumes">Perfumes</option>
-        </select>
+        <div class="admin-card" style="margin-top: 3rem; width: 90%; max-width: 450px;">
+            <h2 style="color: #fff; margin-bottom: 1.5rem; font-size: 2rem;">
+                <i class="fas fa-shopping-bag" style="color: var(--pink); margin-right: 10px;"></i>Incoming Orders
+            </h2>
+            <div id="orders-list" style="color: #fff; max-height: 400px; overflow-y: auto;">
+                <p style="opacity: 0.6; text-align: center;">Waiting for orders...</p>
+            </div>
+            <h2 style="margin-top: 40px; color: var(--pink);">Manage Reviews</h2>
+            <div id="admin-reviews-list" style="text-align: left; margin-top: 20px;">
+            </div>
+        </div>
     </div>
-
-    <div class="input-group" id="newNameGroup" style="display:none;">
-        <i class="fas fa-pen-nib"></i>
-        <input type="text" id="newProdName" placeholder="Product Name (e.g. Misty Rose)">
-    </div>
-
-    <div class="input-group">
-        <i class="fas fa-coins"></i>
-        <input type="number" id="curPrice" placeholder="Selling Price (Ugx)">
-    </div>
-
-    <div class="input-group">
-        <i class="fas fa-history"></i>
-        <input type="number" id="oldPrice" placeholder="Original Price (Ugx)">
-    </div>
-
-    <div class="input-group">
-        <i class="fas fa-camera"></i>
-        <input type="file" id="imageFile" accept="image/*" style="padding-top: 12px;">
-    </div>
-    <div id="upload-progress" style="color: #55efc4; font-size: 0.8rem; margin-bottom: 15px; display: none;">
-        Uploading image... 0%
-    </div>
-
-    <div class="input-group">
-        <i class="fas fa-align-left"></i>
-        <textarea id="prodDesc" placeholder="Product Description..." style="width: 90%; padding: 15px 15px 15px 45px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 15px; color: white; min-height: 100px; font-family: inherit;"></textarea>
-    </div>
-
-    <button class="btn-update" onclick="savePrice()">
-        <i class="fas fa-cloud-upload-alt"></i> Upload to Shop
-    </button>
-
-    <div id="status"></div>
-</div>
-<div class="admin-card" style="margin-top: 3rem; width: 90%; max-width: 450px;">
-    <h2 style="color: #fff; margin-bottom: 1.5rem; font-size: 2rem;">
-        <i class="fas fa-shopping-bag" style="color: var(--pink); margin-right: 10px;"></i>Incoming Orders
-    </h2>
-    <div id="orders-list" style="color: #fff; max-height: 400px; overflow-y: auto;">
-        <p style="opacity: 0.6; text-align: center;">Waiting for orders...</p>
-    </div>
-    <h2 style="margin-top: 40px; color: var(--pink);">Manage Reviews</h2>
-    <div id="admin-reviews-list" style="text-align: left; margin-top: 20px;">
-    </div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compact.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
     function checkPass() {
-    const pass = document.getElementById('adminPass').value;
-    const overlay = document.getElementById('login-overlay');
-    const content = document.getElementById('admin-content');
-    const fail = document.getElementById('fail-msg');
+        const pass = document.getElementById('adminPass').value;
+        const overlay = document.getElementById('login-overlay');
+        const content = document.getElementById('admin-content');
+        const fail = document.getElementById('fail-msg');
 
-    // Change 'Jojo2026' to whatever password you want!
-    if (pass === 'Jojo2026') {
-        overlay.style.display = 'none';
-        content.style.display = 'block';
-        // Optional: Save to session so you don't have to re-type on refresh
-        sessionStorage.setItem('isAdmin', 'true');
-    } else {
-        fail.innerText = "❌ Incorrect Password";
+        if (pass === 'Jojo2026') {
+            overlay.style.display = 'none';
+            content.style.display = 'block';
+            sessionStorage.setItem('isAdmin', 'true');
+        } else {
+            fail.innerText = "❌ Incorrect Password";
+        }
     }
-}
 
-// Check if already logged in for this session
-window.onload = () => {
-    if (sessionStorage.getItem('isAdmin') === 'true') {
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('admin-content').style.display = 'block';
-    }
-};
-    // PASTE YOUR CONFIG FROM INDEX.HTML HERE
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA9ER2RfVM4Iw7Ka6eQ100KDnbuFI31_pg",
-  authDomain: "jojo-collection.firebaseapp.com",
-  projectId: "jojo-collection",
-  storageBucket: "jojo-collection.firebasestorage.app",
-  messagingSenderId: "469101720449",
-  appId: "1:469101720449:web:c668b39259ea141f69ee80",
-  measurementId: "G-J9B2NQ19P5"
-};
+    window.onload = () => {
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+        }
+    };
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA9ER2RfVM4Iw7Ka6eQ100KDnbuFI31_pg",
+        authDomain: "jojo-collection.firebaseapp.com",
+        projectId: "jojo-collection",
+        storageBucket: "jojo-collection.firebasestorage.app",
+        messagingSenderId: "469101720449",
+        appId: "1:469101720449:web:c668b39259ea141f69ee80",
+        measurementId: "G-J9B2NQ19P5"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    function savePrice() {
-        const id = document.getElementById('prodID').value;
+    function toggleNewProductFields() {
+        const selection = document.getElementById('prodID').value;
+        const nameGroup = document.getElementById('newNameGroup');
+        nameGroup.style.display = (selection === 'NEW') ? 'block' : 'none';
+    }
+
+    // FIXED: Removed duplicate function and unified image upload logic
+    async function savePrice() {
+        const selectValue = document.getElementById('prodID').value;
+        const newName = document.getElementById('newProdName').value;
         const cur = parseInt(document.getElementById('curPrice').value);
         const old = parseInt(document.getElementById('oldPrice').value);
+        const fileInput = document.getElementById('imageFile');
+        const desc = document.getElementById('prodDesc').value;
         const status = document.getElementById('status');
 
-        if(!cur || !old) {
-            status.innerHTML = '<span style="color: #ff7675;">❌ Enter all prices</span>';
+        // 1. Determine the Document ID
+        let finalID = selectValue;
+        if (selectValue === 'NEW') {
+            if (!newName) { status.innerHTML = '❌ Name required'; return; }
+            finalID = newName.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        if (!finalID || !cur || !old) {
+            status.innerHTML = '<span style="color: #ff7675;">❌ Enter required fields</span>';
             return;
         }
 
-        status.innerHTML = "⏳ Sending to Cloud...";
+        status.innerHTML = "⏳ Uploading...";
+        let finalImageUrl = "many.jpg"; // Default fallback
 
-        db.collection('products').doc(id).set({
+        // 2. Handle Image Upload FIRST
+        if (fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const storageRef = storage.ref(`products/${finalID}`);
+            const progressDiv = document.getElementById('upload-progress');
+            
+            progressDiv.style.display = 'block';
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressDiv.innerText = `Uploading image... ${Math.round(progress)}%`;
+                }, 
+                (error) => { 
+                    status.innerHTML = "❌ Upload failed: " + error.message;
+                    progressDiv.style.display = 'none';
+                }, 
+                async () => {
+                    finalImageUrl = await uploadTask.snapshot.ref.getDownloadURL();
+                    progressDiv.style.display = 'none';
+                    // NOW save to Firestore AFTER image upload completes
+                    saveProductToFirestore(finalID, cur, old, finalImageUrl, desc, status, fileInput);
+                }
+            );
+        } else {
+            // No image selected, save with default
+            saveProductToFirestore(finalID, cur, old, finalImageUrl, desc, status, fileInput);
+        }
+    }
+
+    // FIXED: New function to handle Firestore save (called AFTER image upload)
+    function saveProductToFirestore(finalID, cur, old, finalImageUrl, desc, status, fileInput) {
+        db.collection('products').doc(finalID).set({
             currentPrice: cur,
             oldPrice: old,
+            image: finalImageUrl,
+            description: desc || 'Premium fragrance from Jojo Collections.',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true })
         .then(() => {
-            status.innerHTML = '<span style="color: #55efc4;">✅ Shop Updated Successfully!</span>';
+            status.innerHTML = '<span style="color: #55efc4;">✅ Product Live!</span>';
+            // Reset form
+            fileInput.value = '';
+            document.getElementById('newProdName').value = '';
+            document.getElementById('curPrice').value = '';
+            document.getElementById('oldPrice').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodID').value = '';
             setTimeout(() => { status.innerHTML = ''; }, 3000);
         })
         .catch(err => {
             status.innerHTML = '❌ Error: ' + err.message;
         });
     }
-// Function to show the name input if "Add New" is selected
-function toggleNewProductFields() {
-    const selection = document.getElementById('prodID').value;
-    const nameGroup = document.getElementById('newNameGroup');
-    nameGroup.style.display = (selection === 'NEW') ? 'block' : 'none';
-}
 
-async function savePrice() {
-    const selectValue = document.getElementById('prodID').value;
-    const newName = document.getElementById('newProdName').value;
-    const cur = parseInt(document.getElementById('curPrice').value);
-    const old = parseInt(document.getElementById('oldPrice').value);
-    const fileInput = document.getElementById('imageFile'); // Ensure you updated the UI to use id="imageFile"
-    const desc = document.getElementById('prodDesc').value;
-    const status = document.getElementById('status');
+    // Load Orders
+    db.collection('orders').onSnapshot((snapshot) => {
+        const ordersList = document.getElementById('orders-list');
+        ordersList.innerHTML = '';
 
-    // 1. Determine the Document ID
-    let finalID = selectValue;
-    if (selectValue === 'NEW') {
-        if (!newName) { status.innerHTML = '❌ Name required'; return; }
-        finalID = newName.toLowerCase().replace(/\s+/g, '-');
-    }
-
-    if (!finalID || !cur || !old) {
-        status.innerHTML = '<span style="color: #ff7675;">❌ Enter required fields</span>';
-        return;
-    }
-
-    status.innerHTML = "⏳ Uploading Image...";
-
-    let finalImageUrl = "many.jpg"; // Default fallback
-
-    // 2. Handle the Image Upload to Firebase Storage
-    // Ensure this part of savePrice handles the progress bar
-if (fileInput.files[0]) {
-    const file = fileInput.files[0];
-    const storageRef = storage.ref(`products/${finalID}`);
-    const progressDiv = document.getElementById('upload-progress');
-    
-    progressDiv.style.display = 'block';
-    const uploadTask = storageRef.put(file);
-
-    uploadTask.on('state_changed', 
-        (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            progressDiv.innerText = `Uploading image... ${Math.round(progress)}%`;
-        }, 
-        (error) => { status.innerHTML = "❌ " + error.message; }, 
-        async () => {
-            finalImageUrl = await uploadTask.snapshot.ref.getDownloadURL();
-            progressDiv.style.display = 'none';
-            finishSavingProduct(finalID, cur, old, finalImageUrl, desc);
+        if (snapshot.empty) {
+            ordersList.innerHTML = '<p>No orders yet!</p>';
+            return;
         }
-    );
-} else {
-    finishSavingProduct(finalID, cur, old, finalImageUrl, desc);
-}
 
-
-    // 3. Save all fields to Firestore
-    db.collection('products').doc(finalID).set({
-        currentPrice: cur,
-        oldPrice: old,
-        image: finalImageUrl,
-        description: desc || 'Premium fragrance from Jojo Collections.',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true })
-    .then(() => {
-        status.innerHTML = '<span style="color: #55efc4;">✅ Product Live!</span>';
-        // Reset form
-        if(fileInput) fileInput.value = '';
-        document.getElementById('newProdName').value = '';
-        document.getElementById('curPrice').value = '';
-        document.getElementById('oldPrice').value = '';
-        document.getElementById('prodDesc').value = '';
-        setTimeout(() => { status.innerHTML = ''; }, 3000);
-    })
-    .catch(err => {
-        status.innerHTML = '❌ Error: ' + err.message;
-    });
-}
-
-   
-
-// Load Orders
-db.collection('orders').onSnapshot((snapshot) => {
-    const ordersList = document.getElementById('orders-list');
-    ordersList.innerHTML = '';
-
-    if (snapshot.empty) {
-        ordersList.innerHTML = '<p>No orders yet!</p>';
-        return;
-    }
-
-    snapshot.forEach((doc) => {
-        const order = doc.data();
-        const date = new Date(order.createdAt).toLocaleDateString();
-        
-        ordersList.innerHTML += `
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between;">
-                    <strong>Phone: ${order.phone}</strong>
-                    <span>${date}</span>
+        snapshot.forEach((doc) => {
+            const order = doc.data();
+            const date = new Date(order.createdAt?.toDate?.() || new Date()).toLocaleDateString();
+            
+            ordersList.innerHTML += `
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong>Phone: ${order.phone}</strong>
+                        <span>${date}</span>
+                    </div>
+                    <p style="margin: 0.5rem 0;">Items: ${order.items.map(i => i.name).join(', ')}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--pink); font-weight: bold;">Total: Ugx ${order.total.toLocaleString()}</span>
+                        <button onclick="deleteOrder('${doc.id}')" style="background: none; color: #ff7675; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
-                <p style="margin: 0.5rem 0;">Items: ${order.items.map(i => i.name).join(', ')}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: var(--pink); font-weight: bold;">Total: Ugx ${order.total.toLocaleString()}</span>
-                    <button onclick="deleteOrder('${doc.id}')" style="background: none; color: #ff7675; cursor: pointer;"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        `;
-    });
-});
-
-// Function to clear orders once fulfilled
-window.deleteOrder = function(id) {
-    if(confirm("Mark this order as completed and delete?")) {
-        db.collection('orders').doc(id).delete()
-        .then(() => {
-            console.log("Order deleted!");
-        })
-        .catch((error) => {
-            console.error("Error removing order: ", error);
+            `;
         });
-    }
-}
-
-// Load Reviews
-db.collection('reviews').onSnapshot(snapshot => {
-    const list = document.getElementById('admin-reviews-list');
-    list.innerHTML = '';
-    if (snapshot.empty) {
-        list.innerHTML = '<p>No reviews found in database.</p>';
-        return;
-    }
-    snapshot.docs.forEach(doc => {
-        const rev = doc.data();
-        // The || (OR) operator ensures that if 'comment' is missing, it checks 'message'
-        const text = rev.comment || rev.message || "Empty review"; 
-        const rating = rev.rating || 0;
-        list.innerHTML += `
-            <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>${rev.name} (${rating}⭐)</strong><br>
-                    <span>${text.substring(0, 50)}...</span>
-                </div>
-                <button onclick="db.collection('reviews').doc('${doc.id}').delete()" style="background:none; color:#ff7675; cursor:pointer;"><i class="fas fa-trash"></i></button>
-            </div>
-        `;
     });
-}, err => {
-    console.error("Database Error: " + err.message);
-});
 
-        
+    window.deleteOrder = function(id) {
+        if(confirm("Mark this order as completed and delete?")) {
+            db.collection('orders').doc(id).delete()
+            .then(() => {
+                console.log("Order deleted!");
+            })
+            .catch((error) => {
+                console.error("Error removing order: ", error);
+            });
+        }
+    }
+
+    // Load Reviews - FIXED: Consistent field name (comment)
+    db.collection('reviews').onSnapshot(snapshot => {
+        const list = document.getElementById('admin-reviews-list');
+        list.innerHTML = '';
+        if (snapshot.empty) {
+            list.innerHTML = '<p>No reviews found in database.</p>';
+            return;
+        }
+        snapshot.docs.forEach(doc => {
+            const rev = doc.data();
+            const text = rev.comment || "Empty review"; 
+            const rating = rev.rating || 0;
+            list.innerHTML += `
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${rev.name} (${rating}⭐)</strong><br>
+                        <span>${text.substring(0, 50)}...</span>
+                    </div>
+                    <button onclick="db.collection('reviews').doc('${doc.id}').delete()" style="background:none; color:#ff7675; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+        });
+    }, err => {
+        console.error("Database Error: " + err.message);
+    });
 </script>
 
 </body>
