@@ -281,7 +281,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
+    const storage = firebase.storage(firebase.app());
 
     function toggleNewProductFields() {
         const selection = document.getElementById('prodID').value;
@@ -317,7 +317,10 @@
         // 2. Handle Image Upload FIRST
         if (fileInput.files[0]) {
             const file = fileInput.files[0];
-            const storageRef = storage.ref(`products/${finalID}`);
+            const file = fileInput.files[0];
+const extension = file.name.split('.').pop();
+
+const storageRef = storage.ref(`products/${finalID}_${Date.now()}.${extension}`);
             const progressDiv = document.getElementById('upload-progress');
             
             progressDiv.style.display = 'block';
