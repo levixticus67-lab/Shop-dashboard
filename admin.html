@@ -442,14 +442,24 @@ error);
     }
 }
 
+// Replace your review listener with this 'safe' version
 db.collection('reviews').onSnapshot(snapshot => {
     const list = document.getElementById('admin-reviews-list');
     list.innerHTML = '';
+    if (snapshot.empty) {
+        list.innerHTML = '<p>No reviews found in database.</p>';
+        return;
+    }
     snapshot.docs.forEach(doc => {
         const rev = doc.data();
-        // Use || to handle different field names (comment vs message)
-        const displayComment = rev.comment || rev.message || "No text";
-        const displayRating = rev.rating || "N/A";
+        // The || (OR) operator ensures that if 'comment' is missing, it checks 'message'
+        const text = rev.comment || rev.message || "Empty review"; 
+        list.innerHTML += `<div><strong>${rev.name}</strong>: ${text}</div>`;
+    });
+}, err => {
+    alert("Database Error: " + err.message); // This will tell you if it's a 'Permission' or 'Index' error
+});
+
         
         list.innerHTML += `
             <div style="background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 10px; border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
